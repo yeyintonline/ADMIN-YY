@@ -87,10 +87,10 @@ html, body {
   background-color: #001628; /* Match the top-bar background */
   
   /* Shape and size */
-  height: 32px;
-  width: 32px;
-  min-width: 32px;
-  margin: 0 8px;
+  height: 27px;
+  width: 27px;
+  min-width: 27px;
+  margin: 0 5px;
   border-radius: 50%;
   padding: 0;
 
@@ -105,7 +105,6 @@ html, body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  transform: translateZ(0);
 }
 
 /* [FIX 1] Add back the hover effect */
