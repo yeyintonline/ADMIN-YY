@@ -1,3 +1,4 @@
+/* === 1. Global & Base Styles === */
 html, body {
   margin: 0;
   padding: 0;
@@ -7,12 +8,23 @@ html, body {
   font-family: sans-serif;
 }
 
+/* === 2. Main App Layout === */
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
+.content {
+  flex-grow: 1;
+  position: relative;
+  background-color: #fff;
+  overflow-y: hidden;
+}
+
+/* === 3. Top Bar & Navigation Tabs === */
+
+/* Top Bar Container */
 .top-bar {
   width: 100%;
   background-color: #001628;
@@ -24,6 +36,7 @@ html, body {
   padding: 0 8px;
 }
 
+/* General Tab Item Style */
 .tab-item {
   padding: 3px 36px;
   cursor: pointer;
@@ -44,9 +57,10 @@ html, body {
 .tab-item:hover,
 .tab-item:focus {
   background: rgba(255, 255, 255, 0.4);
-  outline: none; /* Default browser outline ကို ဖယ်ရှားရန် */
+  outline: none;
 }
 
+/* Active Tab Style */
 .tab-item.active {
   background: rgba(255, 255, 255, 0.9);
   color: #029000;
@@ -55,62 +69,83 @@ html, body {
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
-.content {
-  flex-grow: 1;
-  position: relative;
-  background-color: #fff;
-  overflow-y: hidden;
+/* User-Added Shortcut Tab Style */
+.shortcut-tab {
+  border-left: 2px solid #029000;
 }
 
+/* Manage Shortcuts Button (Sticky) */
+
+#manage-shortcuts-btn {
+  /* Sticky positioning */
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  
+  /* [FIX 2] Add green border */
+  border: 1px solid #029000;
+  background-color: #001628; /* Match the top-bar background */
+  
+  /* Shape and size */
+  height: 32px;
+  width: 32px;
+  min-width: 32px;
+  margin: 0 8px;
+  border-radius: 50%;
+  padding: 0;
+
+  /* Remove default browser highlight */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+
+  /* Original styles */
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+/* [FIX 1] Add back the hover effect */
+#manage-shortcuts-btn:hover {
+  color: #FFFFFF; /* Make the icon fully white */
+  background-color: #029000
+}
+
+/* Scrollbar End Spacing Fix */
+.top-bar::after {
+  content: '';
+  display: block;
+  min-width: 8px;
+}
+
+/* === 4. Main Content Area === */
 .content iframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-.loader {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s, opacity 0.3s linear;
-}
-
-.loader.show {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* style.css ထဲမှာ အောက်က code တွေကို ထပ်ထည့်ပါ */
-
+/* === 5. Top Loading Bar === */
 .top-loader {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px; /* Loading bar ရဲ့ အထူ */
+  height: 3px;
   background-color: transparent;
   overflow: hidden;
   z-index: 10;
-  transform: scaleY(0); /* Default အနေနဲ့ ဖျောက်ထားမယ် */
+  transform: scaleY(0);
   transform-origin: top;
   transition: transform 0.3s ease;
 }
 
 .top-loader.show {
-  transform: scaleY(1); /* .show class ရရင် ပြမယ် */
+  transform: scaleY(1);
 }
 
-/* Loading bar ရဲ့ လှုပ်ရှားနေမယ့်အပိုင်း */
 .top-loader::before {
   content: '';
   position: absolute;
@@ -118,11 +153,10 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #029000; /* Loading bar အရောင် */
+  background-color: #029000;
   animation: loading-bar-animation 1.5s infinite ease-in-out;
 }
 
-/* Loading bar ရဲ့ animation */
 @keyframes loading-bar-animation {
   0% {
     transform: translateX(-100%);
@@ -133,4 +167,140 @@ html, body {
   100% {
     transform: translateX(100%);
   }
+}
+
+/* === 6. Shortcut Management Modal === */
+
+/* Modal Overlay & Content Box */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.9);
+  transition: transform 0.3s;
+}
+
+.modal-overlay.show .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-btn {
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+}
+.close-btn:hover {
+  color: #000;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Modal Form Styles */
+.shortcut-form-container {
+  margin-bottom: 30px;
+}
+.shortcut-form-container h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+.shortcut-form-container input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.shortcut-form-container button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #001628;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.shortcut-form-container button:hover {
+  background-color: #002c50;
+}
+
+/* Modal Shortcuts List Styles */
+#shortcuts-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#shortcuts-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#shortcuts-list li:last-child {
+  border-bottom: none;
+}
+
+#shortcuts-list .shortcut-info {
+  font-size: 14px;
+}
+
+#shortcuts-list .shortcut-actions button {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f7f7f7;
+}
+#shortcuts-list .shortcut-actions .delete-btn {
+  border-color: #d9534f;
+  color: #d9534f;
 }

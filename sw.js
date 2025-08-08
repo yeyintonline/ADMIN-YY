@@ -1,6 +1,6 @@
 // sw.js (Recommended Final Version)
 
-const CACHE_NAME = 'web-wrapper-cache-v1.3'; // <-- Version မြှင့်ဖို့မမေ့ပါနဲ့
+const CACHE_NAME = 'web-wrapper-cache-v2.0'; // <-- Version မြှင့်ဖို့မမေ့ပါနဲ့
 const APP_SHELL_URLS = [
   '/',
   '/index.html',
