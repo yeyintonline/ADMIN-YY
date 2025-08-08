@@ -3,8 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const sites = [
       { name: 'Agent', url: 'https://ag.bet555mix.com/' },
-      { name: 'Master', url: 'https://ms.bet555mix.com/' },
-      { name: 'M 556', url: 'https://ag.moung556.com/' }
+      { name: 'Master', url: 'https://ms.bet555mix.com/' }
     ];
 
     const topBar = document.querySelector('.top-bar');  
