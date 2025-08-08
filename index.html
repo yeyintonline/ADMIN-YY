@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controller</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="app-container">
+        <div class="top-bar">
+            </div>
+        <div class="content">
+            <div id="loader" class="loader">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+            <iframe id="web-view" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(r => console.log('Service Worker registered successfully.'));
+            });
+        }
+    </script>
+    <script src="app.js?v=1.2"></script>
+</body>
+</html>
