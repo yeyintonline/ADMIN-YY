@@ -1,11 +1,12 @@
-  {
+{
   "name": "YY ADMIN",
   "short_name": "YY ADMIN",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#001628",
   "theme_color": "#001628",
-  "description": "Agent YY Contral Panel Website",
+  "description": "Agent YY Control Panel Website",
   "icons": [
     {
       "src": "/images/icon-192.png",
