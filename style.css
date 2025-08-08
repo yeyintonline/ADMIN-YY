@@ -304,3 +304,19 @@ html, body {
   border-color: #d9534f;
   color: #d9534f;
 }
+
+/* style.css */
+
+/* === 8. Hide Scrollbar (for Mobile-Only UX) === */
+
+/* For Webkit-based browsers (Chrome, Safari, Android Chrome) */
+.top-bar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* For Firefox */
+.top-bar {
+  scrollbar-width: none;
+}
