@@ -105,6 +105,7 @@ html, body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  transform: translateZ(0);
 }
 
 /* [FIX 1] Add back the hover effect */
