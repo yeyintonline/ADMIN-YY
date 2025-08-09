@@ -1,6 +1,6 @@
 // sw.js (Recommended Final Version)
 
-const CACHE_NAME = 'web-wrapper-cache-v2.0.3'; // <-- Version မြှင့်ဖို့မမေ့ပါနဲ့
+const CACHE_NAME = 'web-wrapper-cache-v2.0.4'; // <-- Version မြှင့်ဖို့မမေ့ပါနဲ့
 const APP_SHELL_URLS = [
   '/',
   '/index.html',
@@ -8,8 +8,7 @@ const APP_SHELL_URLS = [
   '/app.js',
   '/manifest.json',
   '/images/icon-192.png',
-  '/images/icon-512.png',
-  '/images/icon-maskable-512x512.png'
+  '/images/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
