@@ -38,7 +38,7 @@ html, body {
 
 /* General Tab Item Style */
 .tab-item {
-  padding: 3px 36px;
+  padding: 3px 28px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -117,7 +117,7 @@ html, body {
 .top-bar::after {
   content: '';
   display: block;
-  min-width: 8px;
+  min-width: 16px;
 }
 
 /* === 4. Main Content Area === */
