@@ -14,7 +14,6 @@ html, body {
   flex-direction: column;
   height: 100%;
 }
-
 .content {
   flex-grow: 1;
   position: relative;
@@ -23,22 +22,71 @@ html, body {
 }
 
 /* === 3. Top Bar & Navigation Tabs === */
-
-/* Top Bar Container */
 .top-bar {
   width: 100%;
   background-color: #001628;
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  overflow-x: auto;
   height: 40px;
-  padding: 0 8px;
+  padding: 0 8px; /* Padding for the whole bar */
+}
+
+/* [NEW] The wrapper for tabs that WILL scroll */
+.scrollable-tabs {
+  flex-grow: 1; /* Take up all available space */
+  display: flex;
+  align-items: center;
+  overflow-x: auto; /* SCROLLING happens HERE now */
+  height: 100%;
+}
+
+/* Hide the scrollbar (as decided) */
+.scrollable-tabs::-webkit-scrollbar {
+  display: none;
+}
+.scrollable-tabs {
+  scrollbar-width: none; /* For Firefox */
+}
+
+/* Scrollbar End Spacing Fix for the NEW wrapper */
+.scrollable-tabs::after {
+  content: '';
+  display: block;
+  min-width: 8px;
+}
+
+/* Manage Shortcuts Button (No longer sticky) */
+#manage-shortcuts-btn {
+  /* It's now a simple flex item */
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 23px;
+  width: 23px;
+  min-width: 23px;
+  margin-right: 6px; /* Space between button and tabs */
+  border-radius: 30%;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: pointer;
+  color: #001628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+#manage-shortcuts-btn:hover {
+  color: #029000;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
 /* General Tab Item Style */
 .tab-item {
-  padding: 3px 28px;
+  padding: 3px 30px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -49,11 +97,8 @@ html, body {
   transition: background-color 0.2s, color 0.2s;
   background: rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
   -webkit-tap-highlight-color: transparent;
 }
-
 .tab-item:hover,
 .tab-item:focus {
   background: rgba(255, 255, 255, 0.4);
@@ -72,52 +117,6 @@ html, body {
 /* User-Added Shortcut Tab Style */
 .shortcut-tab {
   border-left: 2px solid #029000;
-}
-
-/* Manage Shortcuts Button (Sticky) */
-
-#manage-shortcuts-btn {
-  /* Sticky positioning */
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  
-  /* [FIX 2] Add green border */
-  border: 1px solid #029000;
-  background-color: #001628; /* Match the top-bar background */
-  
-  /* Shape and size */
-  height: 27px;
-  width: 27px;
-  min-width: 27px;
-  margin: 0 5px;
-  border-radius: 50%;
-  padding: 0;
-
-  /* Remove default browser highlight */
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-
-  /* Original styles */
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-/* [FIX 1] Add back the hover effect */
-#manage-shortcuts-btn:hover {
-  color: #FFFFFF; /* Make the icon fully white */
-  background-color: #029000
-}
-
-/* Scrollbar End Spacing Fix */
-.top-bar::after {
-  content: '';
-  display: block;
-  min-width: 16px;
 }
 
 /* === 4. Main Content Area === */
@@ -187,12 +186,10 @@ html, body {
   opacity: 0;
   transition: opacity 0.3s, visibility 0.3s;
 }
-
 .modal-overlay.show {
   visibility: visible;
   opacity: 1;
 }
-
 .modal-content {
   background-color: #fff;
   border-radius: 8px;
@@ -204,11 +201,9 @@ html, body {
   transform: scale(0.9);
   transition: transform 0.3s;
 }
-
 .modal-overlay.show .modal-content {
   transform: scale(1);
 }
-
 .modal-header {
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
@@ -216,22 +211,21 @@ html, body {
   justify-content: space-between;
   align-items: center;
 }
-
 .modal-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
+  color: #029000;
+  
 }
-
 .close-btn {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
-  color: #aaa;
+  color: #d9534f;
 }
 .close-btn:hover {
   color: #000;
 }
-
 .modal-body {
   padding: 20px;
   overflow-y: auto;
@@ -258,14 +252,14 @@ html, body {
   padding: 10px;
   border: none;
   border-radius: 4px;
-  background-color: #001628;
+  background-color: #029000;
   color: white;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 .shortcut-form-container button:hover {
-  background-color: #002c50;
+  background-color: #004d00;
 }
 
 /* Modal Shortcuts List Styles */
@@ -274,7 +268,6 @@ html, body {
   padding: 0;
   margin: 0;
 }
-
 #shortcuts-list li {
   display: flex;
   justify-content: space-between;
@@ -282,15 +275,12 @@ html, body {
   padding: 12px 8px;
   border-bottom: 1px solid #f0f0f0;
 }
-
 #shortcuts-list li:last-child {
   border-bottom: none;
 }
-
 #shortcuts-list .shortcut-info {
   font-size: 14px;
 }
-
 #shortcuts-list .shortcut-actions button {
   margin-left: 8px;
   padding: 4px 8px;
@@ -304,8 +294,10 @@ html, body {
   border-color: #d9534f;
   color: #d9534f;
 }
-
-/* style.css */
+#shortcuts-list .shortcut-actions .edit-btn {
+  border-color: #029000;
+  color: #029000;
+}
 
 /* === 8. Hide Scrollbar (for Mobile-Only UX) === */
 

@@ -1,11 +1,14 @@
-// app.js (Final Version with State Persistence Fix)
 document.addEventListener('DOMContentLoaded', () => {
     // === Core App Elements ===
     const sites = [
-      { name: 'Agent', url: 'https://ag.bet555mix.com/' },
-      { name: 'Master', url: 'https://ms.bet555mix.com/' }
+        { name: 'Agent', url: 'https://ag.bet555mix.com/' },
+        { name: 'Master', url: 'https://ms.bet555mix.com/' },
+        { name: 'Match', url: 'https://yyscore.netlify.app/' }
+        // You can add your other core sites here
     ];
-    const topBar = document.querySelector('.top-bar');  
+    const topBar = document.querySelector('.top-bar');
+    // [KEY CHANGE] Select the new wrapper for tabs
+    const scrollableTabsWrapper = document.getElementById('scrollable-tabs-wrapper');
     const webView = document.getElementById('web-view');
     const loader = document.getElementById('loader');
     let currentActiveTab = null;
@@ -37,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tabElement.classList.add('active');
         currentActiveTab = tabElement;
         
-        // [FIXED] Remove the isCoreSite check to save state for ALL tabs
         localStorage.setItem('lastActiveUrl', site.url);
     }
 
@@ -58,14 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         shortcutModal.classList.remove('show');
     }
-
-    manageShortcutsBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
-    shortcutModal.addEventListener('click', (event) => {
-        if (event.target === shortcutModal) {
-            closeModal();
-        }
-    });
 
     // === Data Handling Functions (localStorage) ===
     const STORAGE_KEY = 'yy_admin_shortcuts';
@@ -94,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tabDiv.addEventListener('click', () => {
                 activateTab(tabDiv, { name: shortcut.name, url: shortcut.url });
             });
-            topBar.appendChild(tabDiv);
+            // [KEY CHANGE] Append to the new scrollable wrapper
+            scrollableTabsWrapper.appendChild(tabDiv);
         });
     }
 
@@ -121,52 +116,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === CRUD Logic ===
-    // app.js
+    function handleSaveShortcut() {
+        const id = shortcutIdInput.value;
+        const name = shortcutNameInput.value.trim();
+        const url = shortcutUrlInput.value.trim();
 
-function handleSaveShortcut() {
-    const id = shortcutIdInput.value;
-    const name = shortcutNameInput.value.trim();
-    const url = shortcutUrlInput.value.trim();
-
-    if (!name || !url) {
-        alert('Shortcut Name and URL cannot be empty.');
-        return;
-    }
-
-    // [NEW] URL Validation - ထည့်သွင်းလိုက်သော URL မှန်ကန်မှုရှိမရှိ စစ်ဆေးပါ
-    try {
-        // new URL() က URL format မမှန်ရင် error ပစ်ပါလိမ့်မယ်
-        new URL(url);
-        // URL format မှန်ကန်မှသာ အောက်က code တွေ ဆက်အလုပ်လုပ်ပါမယ်
-    } catch (error) {
-        // URL format မမှန်ကန်ရင် user ကို အသိပေးပြီး function ကိုရပ်လိုက်ပါ
-        alert('Please enter a valid URL (e.g., https://example.com)');
-        return; 
-    }
-
-    let shortcuts = getShortcuts();
-
-    if (id) { // --- UPDATE ---
-        const shortcutToUpdate = shortcuts.find(s => s.id == id);
-        if (shortcutToUpdate) {
-            shortcutToUpdate.name = name;
-            shortcutToUpdate.url = url;
+        if (!name || !url) {
+            alert('Shortcut Name and URL cannot be empty.');
+            return;
         }
-    } else { // --- CREATE ---
-        const newShortcut = {
-            id: Date.now(),
-            name: name,
-            url: url
-        };
-        shortcuts.push(newShortcut);
+        try { new URL(url); } catch (error) {
+            alert('Please enter a valid URL (e.g., https://example.com)');
+            return; 
+        }
+
+        let shortcuts = getShortcuts();
+
+        if (id) { // UPDATE
+            const shortcutToUpdate = shortcuts.find(s => s.id == id);
+            if (shortcutToUpdate) {
+                shortcutToUpdate.name = name;
+                shortcutToUpdate.url = url;
+            }
+        } else { // CREATE
+            const newShortcut = {
+                id: Date.now(),
+                name: name,
+                url: url
+            };
+            shortcuts.push(newShortcut);
+        }
+
+        saveShortcuts(shortcuts);
+        
+        if (!id && (sites.length + shortcuts.length) === 1) {
+            setTimeout(() => {
+                const newTabElement = document.querySelector('.shortcut-tab');
+                if (newTabElement) {
+                    activateTab(newTabElement, shortcuts[0]);
+                }
+            }, 0);
+        }
+        
+        closeModal();
     }
-
-    saveShortcuts(shortcuts);
-    closeModal();
-}
     
+    // === Event Listeners ===
+    manageShortcutsBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    shortcutModal.addEventListener('click', (event) => {
+        if (event.target === shortcutModal) {
+            closeModal();
+        }
+    });
     saveShortcutBtn.addEventListener('click', handleSaveShortcut);
-
     shortcutsList.addEventListener('click', (event) => {
         const target = event.target;
         const id = target.dataset.id;
@@ -194,13 +197,17 @@ function handleSaveShortcut() {
 
     // === Initial Application Setup ===
     function initializeApp() {
-        const lastUrl = localStorage.getItem('lastActiveUrl');
-
-        // [FIXED] Combine core sites and shortcuts to find the tab to load
         const allPossibleTabs = [...sites, ...getShortcuts()];
+        
+        if (allPossibleTabs.length === 0) {
+            // This logic is for the full bookmark version. It does nothing if `sites` array has items.
+            // For V2.0, since `sites` has items, this part is inactive.
+        }
+
+        const lastUrl = localStorage.getItem('lastActiveUrl');
         let siteToLoad = allPossibleTabs.find(tab => tab.url === lastUrl);
-        if (!siteToLoad) {
-            siteToLoad = sites[0] || null; // Fallback to first core site
+        if (!siteToLoad && allPossibleTabs.length > 0) {
+            siteToLoad = allPossibleTabs[0];
         }
         
         if (!siteToLoad) {
@@ -208,35 +215,32 @@ function handleSaveShortcut() {
              return;
         }
 
-        // Render all tabs first
+        // Render core tabs
         sites.forEach(site => {
             const tabDiv = document.createElement('div');
             tabDiv.className = 'tab-item';
             tabDiv.textContent = site.name;
             tabDiv.addEventListener('click', () => activateTab(tabDiv, site));
-            topBar.appendChild(tabDiv);
+            // [KEY CHANGE] Append to the new scrollable wrapper
+            scrollableTabsWrapper.appendChild(tabDiv);
         });
+        
         renderShortcutTabs();
         
-        // Now find the specific tab element to activate
-        // We need to wait a moment for the DOM to update with the new tabs
-        setTimeout(() => {
-            const allTabElements = document.querySelectorAll('.tab-item');
-            let tabElementToActivate = Array.from(allTabElements).find(el => {
-                // This is a bit tricky since we only have the name in the element.
-                // We need to find the original site/shortcut object to match the URL.
-                const tabName = el.textContent;
-                const correspondingTabObject = allPossibleTabs.find(t => t.name === tabName);
-                return correspondingTabObject && correspondingTabObject.url === siteToLoad.url;
-            });
-
-            if (tabElementToActivate) {
-                activateTab(tabElementToActivate, siteToLoad);
-            } else {
-                // Fallback if the specific tab element isn't found for some reason
-                activateTab(document.querySelector('.tab-item'), sites[0]);
-            }
-        }, 0);
+        if (siteToLoad) {
+            setTimeout(() => {
+                const allTabElements = document.querySelectorAll('.tab-item');
+                let tabElementToActivate = Array.from(allTabElements).find(el => {
+                    const tabName = el.textContent;
+                    const correspondingTabObject = allPossibleTabs.find(t => t.name === tabName);
+                    return correspondingTabObject && correspondingTabObject.url === siteToLoad.url;
+                });
+    
+                if (tabElementToActivate) {
+                    activateTab(tabElementToActivate, siteToLoad);
+                }
+            }, 0);
+        }
     }
 
     initializeApp();
