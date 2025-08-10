@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // === Core App Elements ===
     const sites = [
+        { name: '556', url: 'https://ag.moung556.com/' },
         { name: 'Agent', url: 'https://ag.bet555mix.com/' },
         { name: 'Master', url: 'https://ms.bet555mix.com/' },
         { name: 'Match', url: 'https://yyscore.netlify.app/' }
@@ -117,49 +118,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === CRUD Logic ===
     function handleSaveShortcut() {
-        const id = shortcutIdInput.value;
-        const name = shortcutNameInput.value.trim();
-        const url = shortcutUrlInput.value.trim();
+    // === Step 1: Get data from form inputs ===
+    const id = shortcutIdInput.value;
+    const name = shortcutNameInput.value.trim();
+    let url = shortcutUrlInput.value.trim(); // Use 'let' because we might modify it
 
-        if (!name || !url) {
-            alert('Shortcut Name and URL cannot be empty.');
-            return;
-        }
-        try { new URL(url); } catch (error) {
-            alert('Please enter a valid URL (e.g., https://example.com)');
-            return; 
-        }
-
-        let shortcuts = getShortcuts();
-
-        if (id) { // UPDATE
-            const shortcutToUpdate = shortcuts.find(s => s.id == id);
-            if (shortcutToUpdate) {
-                shortcutToUpdate.name = name;
-                shortcutToUpdate.url = url;
-            }
-        } else { // CREATE
-            const newShortcut = {
-                id: Date.now(),
-                name: name,
-                url: url
-            };
-            shortcuts.push(newShortcut);
-        }
-
-        saveShortcuts(shortcuts);
-        
-        if (!id && (sites.length + shortcuts.length) === 1) {
-            setTimeout(() => {
-                const newTabElement = document.querySelector('.shortcut-tab');
-                if (newTabElement) {
-                    activateTab(newTabElement, shortcuts[0]);
-                }
-            }, 0);
-        }
-        
-        closeModal();
+    // === Step 2: Basic validation for empty fields ===
+    if (!name || !url) {
+        alert('Shortcut Name and URL cannot be empty.');
+        return;
     }
+
+    // === Step 3: [NEW FEATURE] Smartly add 'https://' if no protocol is present ===
+    // This regex checks if the string starts with a common protocol like http://, https://, ftp://
+    if (!/^(https?:\/\/|ftp:\/\/)/i.test(url)) {
+        console.log(`Protocol missing. Prepending 'https://' to '${url}'`);
+        url = 'https://' + url;
+    }
+
+    // === Step 4: Now, validate the final URL format ===
+    try {
+        new URL(url);
+    } catch (error) {
+        alert('The URL seems to be invalid, even after attempting to add "https://". Please check the format.');
+        return;
+    }
+
+    // === Step 5: Get the current list of shortcuts ===
+    let shortcuts = getShortcuts();
+
+    // === Step 6: Differentiate between UPDATE (has ID) and CREATE (no ID) ===
+    if (id) {
+        // This is an UPDATE operation
+        // Use String() conversion and strict equality '===' for safer comparison
+        const shortcutToUpdate = shortcuts.find(s => String(s.id) === String(id));
+        if (shortcutToUpdate) {
+            shortcutToUpdate.name = name;
+            shortcutToUpdate.url = url;
+        }
+    } else {
+        // This is a CREATE operation
+        const newShortcut = {
+            // Use the more robust crypto.randomUUID() for new IDs.
+            // This avoids potential collisions from Date.now().
+            id: crypto.randomUUID(),
+            name: name,
+            url: url
+        };
+        shortcuts.push(newShortcut);
+    }
+
+    // === Step 7: Save the updated array back to localStorage and re-render UI ===
+    saveShortcuts(shortcuts);
+
+    // === Step 8: Special logic to auto-activate the very first shortcut added ===
+    // This part is for when the 'sites' array is empty and this is the first shortcut.
+    if (!id && (sites.length + shortcuts.length) === 1) {
+        setTimeout(() => {
+            const newTabElement = document.querySelector('.shortcut-tab');
+            if (newTabElement) {
+                activateTab(newTabElement, shortcuts[0]);
+            }
+        }, 0);
+    }
+
+    // === Step 9: Close the modal after completion ===
+    closeModal();
+}
     
     // === Event Listeners ===
     manageShortcutsBtn.addEventListener('click', openModal);

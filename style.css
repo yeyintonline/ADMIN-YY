@@ -86,7 +86,7 @@ html, body {
 
 /* General Tab Item Style */
 .tab-item {
-  padding: 3px 30px;
+  padding: 3px 20px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
