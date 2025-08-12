@@ -76,7 +76,8 @@ html, body {
   transform: scaleY(1); }
 .top-loader::before {
   content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--accent-color-main); animation: loading-bar-animation 1.5s infinite ease-in-out; }
-@keyframes loading-bar-animation { 0% { transform: translateX(-100%); } 50% { transform: translateX(0%); } 100% { transform: translateX(100%); } }
+@keyframes loading-bar-animation {
+  0% { transform: translateX(-100%); } 50% { transform: translateX(0%); } 100% { transform: translateX(100%); } }
 
 /* === 4. Bottom Navigation Bar (No Changes) === */
 .bottom-bar {
@@ -152,10 +153,18 @@ html, body {
 
 .tab-item:hover, #toggle-drawer-btn:hover, #manage-shortcuts-btn:hover {
   background: var(--button-background-hover); box-shadow: var(--button-shadow-hover); }
-.tab-item.active, #toggle-drawer-btn.active {
-  background: var(--button-background-active); color: var(--accent-color-main); border-color: #ced4da; box-shadow: var(--button-shadow-active); font-weight: 700; }
-#manage-shortcuts-btn:active {
-  background: var(--button-background-active); box-shadow: var(--button-shadow-active); }
+  
+
+.tab-item.active,
+#toggle-drawer-btn.active,
+#manage-shortcuts-btn.active {
+  background: var(--button-background-active);
+  color: var(--accent-color-main);
+  border-color: #ced4da;
+  box-shadow: var(--button-shadow-active);
+  font-weight: 700;
+}
+  
 #toggle-drawer-btn, #manage-shortcuts-btn {
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: var(--button-height-action); height: var(--button-height-action); min-width: var(--button-height-action); padding: 0; margin: 0; border-radius: 7px; background: var(--button-background-default); border: 1px solid var(--panel-border-color); color: var(--text-color-blue); cursor: pointer; -webkit-tap-highlight-color: transparent; box-shadow: var(--button-shadow-default); transition: all 0.2s ease-in-out; }
 #toggle-drawer-btn svg path {
@@ -204,3 +213,4 @@ html, body {
   color: var(--danger-color); }
 #shortcuts-list .shortcut-actions .edit-btn {
   color: var(--info-color); }
+  

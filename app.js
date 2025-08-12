@@ -32,39 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortcutUrlInput = document.getElementById('shortcut-url');
     const saveShortcutBtn = document.getElementById('save-shortcut-btn');
 
-    // === Core App & UI Logic ===
 
-    // This function now contains the robust, one-time listener fix.
-    function activateButton(buttonElement, site) {
-        if (webView.src === site.url) {
-            return; // Do nothing if the URL is already active.
-        }
-        document.title = site.name;
-        loader.classList.add('show');
 
-        const onPageLoad = () => {
-            loader.classList.remove('show');
-            webView.removeEventListener('load', onPageLoad);
-        };
-        webView.addEventListener('load', onPageLoad);
-        
-        webView.src = site.url;
-
-        if (currentActiveButton) {
-            currentActiveButton.classList.remove('active');
-        }
-        buttonElement.classList.add('active');
-        currentActiveButton = buttonElement;
-        localStorage.setItem('lastActiveUrl', site.url);
-    }
+//
+// ---> app.js ထဲတွင် ဤ function ကို အစားထိုးရန် <---
+//
 
 function toggleDrawer() {
-    isDrawerOpen = !isDrawerOpen; // Flip the state
+    isDrawerOpen = !isDrawerOpen;
     bottomBar.classList.toggle('is-open', isDrawerOpen);
-    
-    // [NEW] Add or remove the 'active' class on the toggle button itself
-    // based on the drawer's open/closed state.
-    toggleDrawerBtn.classList.toggle('active', isDrawerOpen);
+
+    // [NEW LOGIC] Check if the current active button is a shortcut.
+    // The '!currentActiveButton' check handles the case where the app just loaded.
+    if (!currentActiveButton || !currentActiveButton.classList.contains('shortcut-button')) {
+        // If no shortcut is active, the button's state is tied ONLY to the drawer being open/closed.
+        toggleDrawerBtn.classList.toggle('active', isDrawerOpen);
+    }
+    // If a shortcut IS active, we DO NOTHING here. We let the activateButton function
+    // control the active state, ensuring it stays ON even when the drawer closes.
 }
 
     // === UI Rendering Functions ===
@@ -79,26 +64,56 @@ function toggleDrawer() {
  */
 function createTabButton(site, isShortcut = false) {
     const button = document.createElement('button');
-    
-    // 1. Add the shared 'base' class to ALL buttons
-    button.className = 'tab-item'; 
-    
-    // 2. Add the specific 'modifier' class based on the button type
+    button.className = 'tab-item';
     if (isShortcut) {
         button.classList.add('shortcut-button');
     } else {
         button.classList.add('core-button');
     }
-    
     button.textContent = site.name;
     button.title = site.name;
+    // Pass 'isShortcut' flag to the activateButton function on click
     button.addEventListener('click', () => {
-        activateButton(button, site);
+        activateButton(button, site, isShortcut);
         if (isDrawerOpen) {
             toggleDrawer();
         }
     });
     return button;
+}
+
+function activateButton(buttonElement, site, isShortcut) {
+    if (webView.src === site.url) {
+        return;
+    }
+    
+    // [NEW LOGIC] Add/remove the 'active' class on BOTH side buttons
+    if (isShortcut) {
+        // If a shortcut is active, make BOTH side buttons active
+        toggleDrawerBtn.classList.add('active');
+        manageShortcutsBtn.classList.add('active');
+    } else {
+        // If a core button is active, make BOTH side buttons inactive
+        toggleDrawerBtn.classList.remove('active');
+        manageShortcutsBtn.classList.remove('active');
+    }
+
+    // --- The rest of the function remains the same ---
+    document.title = site.name;
+    loader.classList.add('show');
+    const onPageLoad = () => {
+        loader.classList.remove('show');
+        webView.removeEventListener('load', onPageLoad);
+    };
+    webView.addEventListener('load', onPageLoad);
+    webView.src = site.url;
+
+    if (currentActiveButton) {
+        currentActiveButton.classList.remove('active');
+    }
+    buttonElement.classList.add('active');
+    currentActiveButton = buttonElement;
+    localStorage.setItem('lastActiveUrl', site.url);
 }
 
 /**
@@ -200,11 +215,14 @@ function populateBottomBar() {
         resetForm();
         renderManagementList();
         shortcutModal.classList.add('show');
+        manageShortcutsBtn.classList.add('active');
     }
 
     function closeModal() {
         shortcutModal.classList.remove('show');
+        manageShortcutsBtn.classList.remove('active');
     }
+    
     
     // === Event Listeners ===
 
@@ -244,29 +262,29 @@ function populateBottomBar() {
         }
     });
 
-    // === Initial Application Setup ===
+function initializeApp() {
+    populateBottomBar();
+    
+    const allPossibleSites = [...sites, ...getShortcuts()];
+    if (allPossibleSites.length === 0) return;
 
-    function initializeApp() {
-        populateBottomBar();
-        
-        const allPossibleSites = [...sites, ...getShortcuts()];
-        const lastUrl = localStorage.getItem('lastActiveUrl');
-        let siteToLoad = allPossibleSites.find(site => site.url === lastUrl) || allPossibleSites[0];
+    // The logic is now simpler: it only uses localStorage, not the URL hash.
+    const lastUrl = localStorage.getItem('lastActiveUrl');
+    let siteToLoad = allPossibleSites.find(site => site.url === lastUrl) || allPossibleSites[0];
 
-        if (siteToLoad) {
-            setTimeout(() => {
-                const allButtons = document.querySelectorAll('.bottom-bar .tab-item');
-                const buttonToActivate = Array.from(allButtons).find(btn => btn.title === siteToLoad.name);
-                
-                if (buttonToActivate) {
-                    activateButton(buttonToActivate, siteToLoad);
-                } else if (allButtons.length > 0) {
-                    // Fallback if last active site was deleted
-                    activateButton(allButtons[0], allPossibleSites[0]);
-                }
-            }, 0);
-        }
+    if (siteToLoad) {
+        setTimeout(() => {
+            const allButtons = document.querySelectorAll('.bottom-bar .tab-item');
+            const buttonToActivate = Array.from(allButtons).find(btn => btn.title === siteToLoad.name);
+            
+            if (buttonToActivate) {
+                activateButton(buttonToActivate, siteToLoad);
+            } else if (allButtons.length > 0) {
+                activateButton(allButtons[0], allPossibleSites[0]);
+            }
+        }, 0);
     }
+}
 
     // Run the app
     initializeApp();
