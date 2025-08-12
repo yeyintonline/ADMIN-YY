@@ -1,322 +1,340 @@
-/* === 1. Global & Base Styles === */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  font-family: sans-serif;
+/* ======================================================= */
+/* === style.css - V3.5 Final Glass Theme Version      === */
+/* ======================================================= */
+
+/* === 1. Theme Variables (The Main Control Panel) === */
+:root {
+  /* --- Main Layout & Backgrounds --- */
+  --body-background: #ffffff;
+  --app-container-background: #f4f4f4;
+  --panel-background: #f8f9fa; 
+  --panel-background-dark: #001528; 
+  
+  /* --- Accent Colors --- */
+  --accent-color-main: #029000;
+  --accent-color-dark: #004d00;
+  --info-color: #D3BF00;
+  --danger-color: #dc3545;
+
+  /* --- Text Colors --- */
+  --text-color-dark: #000000;
+  --text-color-light: #ffffff;
+  --text-color-soft: #999999;
+  --text-color-yellow: #61551a;
+  --text-color-green: #004d00;
+  --text-color-blue: #2c4a63;
+  --text-color-darkblue: #001528;
+
+  /* --- Button Specifics Color */
+  --button-background-default: #ffffff; 
+  --button-background-hover: #f1f3f5;
+  --button-background-active: #e9ecef;
+  
+  /* --- Borders & Shadows --- */
+  --panel-border-color: #dee2e6; 
+  --panel-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); 
+  --border-color-soft: #eeeeee;
+  --border-color-medium: #cccccc;
 }
 
-/* === 2. Main App Layout === */
+/* === 2. Global & Main Layout === */
+html, body {
+  background-color: var(--body-background);
+  margin: 0; padding: 0; height: 100%; width: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-color-dark);
+}
+* { box-sizing: border-box; }
+
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: var(--app-container-background);
 }
 .content {
   flex-grow: 1;
   position: relative;
-  background-color: #fff;
-  overflow-y: hidden;
-}
-
-/* === 3. Top Bar & Navigation Tabs === */
-.top-bar {
-  width: 100%;
-  background-color: #001628;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  height: 40px;
-  padding: 0 8px; /* Padding for the whole bar */
-}
-
-/* [NEW] The wrapper for tabs that WILL scroll */
-.scrollable-tabs {
-  flex-grow: 1; /* Take up all available space */
-  display: flex;
-  align-items: center;
-  overflow-x: auto; /* SCROLLING happens HERE now */
-  height: 100%;
-}
-
-/* Hide the scrollbar (as decided) */
-.scrollable-tabs::-webkit-scrollbar {
-  display: none;
-}
-.scrollable-tabs {
-  scrollbar-width: none; /* For Firefox */
-  scroll-snap-type: x proximity;
-}
-
-/* Scrollbar End Spacing Fix for the NEW wrapper */
-.scrollable-tabs::after {
-  content: '';
-  display: block;
-  min-width: 8px;
-}
-
-/* Manage Shortcuts Button (No longer sticky) */
-#manage-shortcuts-btn {
-  /* It's now a simple flex item */
-  background-color: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  height: 23px;
-  width: 23px;
-  min-width: 23px;
-  margin-right: 6px; /* Space between button and tabs */
-  border-radius: 30%;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  cursor: pointer;
-  color: #001628;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-#manage-shortcuts-btn:hover {
-  color: #029000;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
-}
-
-/* General Tab Item Style */
-.tab-item {
-  padding: 3px 20px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: #001628;
-  white-space: nowrap;
-  border-radius: 10px;
-  margin: 0 4px;
-  transition: background-color 0.2s, color 0.2s;
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  -webkit-tap-highlight-color: transparent;
-  scroll-snap-align: start; 
-}
-.tab-item:hover,
-.tab-item:focus {
-  background: rgba(255, 255, 255, 0.4);
-  outline: none;
-}
-
-/* Active Tab Style */
-.tab-item.active {
-  background: rgba(255, 255, 255, 0.9);
-  color: #029000;
-  font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
-}
-
-/* User-Added Shortcut Tab Style */
-.shortcut-tab {
-  border-left: 2px solid #029000;
-}
-
-/* === 4. Main Content Area === */
-.content iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* === 5. Top Loading Bar === */
-.top-loader {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background-color: transparent;
   overflow: hidden;
-  z-index: 10;
-  transform: scaleY(0);
-  transform-origin: top;
+  padding-bottom: 45px;
+}
+.content iframe { width: 100%; height: 100%; border: none; }
+
+/* === 3. Loading Bar === */
+.top-loader {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 3px; z-index: 10;
+  overflow: hidden; background-color: transparent;
+  transform: scaleY(0); transform-origin: top;
   transition: transform 0.3s ease;
 }
-
-.top-loader.show {
-  transform: scaleY(1);
-}
-
+.top-loader.show { transform: scaleY(1); }
 .top-loader::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #029000;
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: var(--accent-color-main);
   animation: loading-bar-animation 1.5s infinite ease-in-out;
 }
-
 @keyframes loading-bar-animation {
-  0% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+/* === 4. Bottom Navigation Bar === */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background-color: var(--panel-background);
+  border-top: 1px solid var(--panel-border-color);
+  box-shadow: var(--panel-shadow);
+  z-index: 50; height: 45px;
+  transition: height 0.3s ease-in-out;
+  overflow: hidden;
+}
+.bottom-bar.is-open { height: 24vh; }
+.visible-bar {
+  display: flex; align-items: center;
+  height: 45px; padding: 0 10px; gap: 8px;
+}
+.core-buttons {
+  flex-grow: 1; display: flex; align-items: center;
+  gap: 8px; padding: 5px 0;
+  overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+}
+.core-buttons::-webkit-scrollbar { display: none; }
+
+.expandable-drawer {
+  height: calc(40vh - 45px);
+  overflow-y: auto;
+  padding: 10px;
+}
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 6px;
+}
+
+/* === 5. Buttons (Base, Modifiers, States, Actions) === */
+
+/* --- 5a. Core & Shortcut Tab Buttons --- */
+.tab-item {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin: 0; padding: 0 8px;
+  border-radius: 7px;
+  background: #f8f9fa; 
+  border: 1px solid #dee2e6; 
+  color: var(--text-color-soft);
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tab-item:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+.tab-item.active {
+  background: #e9ecef;
+  color: var(--accent-color-main);
+  border-color: #ced4da;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: 700;
+}
+.core-button {
+  width: 63px;
+  height: 27px;
+}
+.shortcut-button {
+  width: 80px;
+  height: 30px;
+  color: var(--text-color-blue);
+  /* border-left: 1.5px solid var(--text-color-blue); */
+}
+
+/* --- 5b. Toggle Drawer Button --- */
+#toggle-drawer-btn {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; width: 27px; height: 27px; min-width: 27px;
+  padding: 0; margin: 0;
+  border-radius: 7px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: var(--text-color-blue);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+  transition: all 0.2s ease-in-out;
+}
+#toggle-drawer-btn:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+#toggle-drawer-btn.active {
+  background: #e9ecef;
+  color: var(--text-color-blue);
+  border-color: #ced4da;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+#toggle-drawer-btn svg path {
+  /* Add an outline (stroke) to the existing shape.
+     'currentColor' is a special keyword that automatically matches
+     the icon's fill color (which is inherited from the button's text color).
+  */
+  stroke: currentColor;
+
+  /* This is the key property to control the thickness.
+     Start with a value like 1 or 1.5. 
+     Higher values will make the icon much thicker.
+  */
+  stroke-width: 2; 
+}
+.bottom-bar.is-open #toggle-drawer-btn {
+  transform: rotate(180deg);
+}
+
+/* --- 5c. Manage Shortcuts Button --- */
+#manage-shortcuts-btn {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; width: 27px; height: 27px; min-width: 27px;
+  padding: 0; margin: 0;
+  border-radius: 7px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: var(--text-color-blue);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+  transition: all 0.2s ease-in-out;
+}
+#manage-shortcuts-btn:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+#manage-shortcuts-btn:active {
+  background: #e9ecef;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* === 6. Shortcut Management Modal === */
-
-/* Modal Overlay & Content Box */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  visibility: hidden;
-  opacity: 0;
+  z-index: 100; display: flex; justify-content: center; align-items: center;
+  visibility: hidden; opacity: 0;
   transition: opacity 0.3s, visibility 0.3s;
 }
-.modal-overlay.show {
-  visibility: visible;
-  opacity: 1;
-}
+.modal-overlay.show { visibility: visible; opacity: 1; }
 .modal-content {
-  background-color: #fff;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  transform: scale(0.9);
-  transition: transform 0.3s;
+  background-color: var(--panel-background);
+  border-radius: 8px; width: 90%; max-width: 500px; max-height: 80vh;
+  display: flex; flex-direction: column;
+  transform: scale(0.9); transition: transform 0.3s;
 }
-.modal-overlay.show .modal-content {
-  transform: scale(1);
-}
+.modal-overlay.show .modal-content { transform: scale(1); }
 .modal-header {
   padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  border-bottom: 1px solid var(--border-color-soft);
+  display: flex; justify-content: space-between; align-items: center;
 }
 .modal-header h2 {
-  margin: 0;
-  font-size: 20px;
-  color: #029000;
-  
-}
-.modal-body h3 {
-  font-size: 15px;
-}
+  margin: 0; font-size: 20px; color: var(--text-color-blue); }
+
 .close-btn {
-  font-size: 28px;
+  /* [NEW] For perfect centering and consistent size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;  /* Make it a perfect square */
+  height: 28px;
+  
+  font-size: 28px; /* Adjusted font size to fit the new box */
   font-weight: bold;
   cursor: pointer;
-  color: #d9534f;
+  color: var(--danger-color);
+  /* Your floating styles are perfect */
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 7px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+  transition: all 0.2s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
 }
 .close-btn:hover {
-  color: #000;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  color: #000; /* Make the '×' darker on hover */
 }
 .modal-body {
-  padding: 20px;
-  overflow-y: auto;
-}
+  padding: 20px; overflow-y: auto; }
+.modal-body h3 {
+  font-size: 15px; margin-top: 0; margin-bottom: 15px; color: var(--text-color-blue); }
 
-/* Modal Form Styles */
-.shortcut-form-container {
-  margin-bottom: 30px;
-}
-.shortcut-form-container h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-}
+
+/* === 7. Consistent Modal Button Styles   === */
+.shortcut-form-container { margin-bottom: 30px; }
 .shortcut-form-container input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  width: 100%; padding: 10px; margin-bottom: 10px;
+  border: 1px solid var(--border-color-medium);
+  border-radius: 4px; font-size: 12px;
 }
+/* --- The "Save" button --- */
 .shortcut-form-container button {
   width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #029000;
-  color: white;
-  font-weight: bold;
+  padding: 9px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Apply the "floating" style, similar to .tab-item */
+  background: #f8f9fa; 
+  border: 1px solid #dee2e6;
+  color: var(--accent-color-main);
+  border-radius: 7px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.11);
+  transition: all 0.2s ease-in-out;
 }
 .shortcut-form-container button:hover {
-  background-color: #004d00;
+  background: rgba(75, 184, 105, 0.12);
+  box-shadow: 0 6px 10px rgba(75, 184, 105, 0.10);
+}
+.shortcut-form-container button:active {
+  background: #e9ecef;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-
-/* Modal Shortcuts List Styles */
-#shortcuts-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
+#shortcuts-list { list-style-type: none; padding: 0; margin: 0; }
 #shortcuts-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 8px;
-  border-bottom: 1px solid #f0f0f0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border-color-soft);
 }
-#shortcuts-list li:last-child {
-  border-bottom: none;
-}
+#shortcuts-list li:last-child { border-bottom: none; }
 #shortcuts-list .shortcut-info {
-  font-size: 14px;
+  font-size: 12px; font-weight: 700;
+  color: var(--text-color-blue);
 }
+
 #shortcuts-list .shortcut-actions button {
   margin-left: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f7f7f7;
+  padding: 3px 10px; /* Adjust padding for better shape */
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border-radius: 7px;
+  background: #f8f9fa; /* Match floating button style */
+  border: 1px solid #dee2e6;
+  color: var(--text-color-dark); /* Default to dark text */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+  transition: all 0.2s ease-in-out;
+    -webkit-tap-highlight-color: transparent;
+}
+#shortcuts-list .shortcut-actions button:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 #shortcuts-list .shortcut-actions .delete-btn {
-  border-color: #d9534f;
-  color: #d9534f;
-  font-weight: 700;
+  color: var(--danger-color);
 }
 #shortcuts-list .shortcut-actions .edit-btn {
-  border-color: #029000;
-  color: #029000;
-  font-weight: 700;
-}
-
-/* === 8. Hide Scrollbar (for Mobile-Only UX) === */
-
-/* For Webkit-based browsers (Chrome, Safari, Android Chrome) */
-.top-bar::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-/* For Firefox */
-.top-bar {
-  scrollbar-width: none;
+  color: var(--accent-color-main);
 }

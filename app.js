@@ -1,20 +1,27 @@
+// ==============================================
+// === app.js - V3.0 Final Production Version ===
+// ==============================================
+
 document.addEventListener('DOMContentLoaded', () => {
-    // === Core App Elements ===
+
+    // === Core Data & State ===
     const sites = [
         { name: '556', url: 'https://ag.moung556.com/' },
         { name: 'Agent', url: 'https://ag.bet555mix.com/' },
         { name: 'Master', url: 'https://ms.bet555mix.com/' },
         { name: 'Match', url: 'https://yyscore.netlify.app/' }
-        // You can add your other core sites here
     ];
-    const topBar = document.querySelector('.top-bar');
-    // [KEY CHANGE] Select the new wrapper for tabs
-    const scrollableTabsWrapper = document.getElementById('scrollable-tabs-wrapper');
+    const STORAGE_KEY = 'yy_admin_shortcuts';
+    let currentActiveButton = null;
+    let isDrawerOpen = false;
+
+    // === Element Selectors ===
     const webView = document.getElementById('web-view');
     const loader = document.getElementById('loader');
-    let currentActiveTab = null;
-
-    // === Shortcut Feature Elements ===
+    const bottomBar = document.getElementById('bottom-bar');
+    const coreButtonsContainer = document.getElementById('core-buttons-container');
+    const shortcutButtonsContainer = document.getElementById('shortcut-buttons-container');
+    const toggleDrawerBtn = document.getElementById('toggle-drawer-btn');
     const manageShortcutsBtn = document.getElementById('manage-shortcuts-btn');
     const shortcutModal = document.getElementById('shortcut-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
@@ -25,26 +32,163 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortcutUrlInput = document.getElementById('shortcut-url');
     const saveShortcutBtn = document.getElementById('save-shortcut-btn');
 
-    // === Core App Logic ===
-    webView.addEventListener('load', () => {
-        loader.classList.remove('show');
-    });
+    // === Core App & UI Logic ===
 
-    function activateTab(tabElement, site) {
+    // This function now contains the robust, one-time listener fix.
+    function activateButton(buttonElement, site) {
+        if (webView.src === site.url) {
+            return; // Do nothing if the URL is already active.
+        }
         document.title = site.name;
         loader.classList.add('show');
+
+        const onPageLoad = () => {
+            loader.classList.remove('show');
+            webView.removeEventListener('load', onPageLoad);
+        };
+        webView.addEventListener('load', onPageLoad);
+        
         webView.src = site.url;
 
-        if (currentActiveTab) {
-            currentActiveTab.classList.remove('active');
+        if (currentActiveButton) {
+            currentActiveButton.classList.remove('active');
         }
-        tabElement.classList.add('active');
-        currentActiveTab = tabElement;
-        
+        buttonElement.classList.add('active');
+        currentActiveButton = buttonElement;
         localStorage.setItem('lastActiveUrl', site.url);
     }
 
-    // === Shortcut Modal Visibility Logic ===
+function toggleDrawer() {
+    isDrawerOpen = !isDrawerOpen; // Flip the state
+    bottomBar.classList.toggle('is-open', isDrawerOpen);
+    
+    // [NEW] Add or remove the 'active' class on the toggle button itself
+    // based on the drawer's open/closed state.
+    toggleDrawerBtn.classList.toggle('active', isDrawerOpen);
+}
+
+    // === UI Rendering Functions ===
+
+/**
+ * Creates a button element for the bottom bar.
+ * Assigns a shared base class (.tab-item) and a specific modifier class 
+ * (.core-button or .shortcut-button).
+ * @param {object} site - The site or shortcut object.
+ * @param {boolean} isShortcut - If true, applies the shortcut-specific class.
+ * @returns {HTMLButtonElement}
+ */
+function createTabButton(site, isShortcut = false) {
+    const button = document.createElement('button');
+    
+    // 1. Add the shared 'base' class to ALL buttons
+    button.className = 'tab-item'; 
+    
+    // 2. Add the specific 'modifier' class based on the button type
+    if (isShortcut) {
+        button.classList.add('shortcut-button');
+    } else {
+        button.classList.add('core-button');
+    }
+    
+    button.textContent = site.name;
+    button.title = site.name;
+    button.addEventListener('click', () => {
+        activateButton(button, site);
+        if (isDrawerOpen) {
+            toggleDrawer();
+        }
+    });
+    return button;
+}
+
+/**
+ * Clears and re-renders all buttons in the bottom bar, separating core sites
+ * from user-added shortcuts.
+ */
+function populateBottomBar() {
+    coreButtonsContainer.innerHTML = '';
+    shortcutButtonsContainer.innerHTML = '';
+
+    // Populate core site buttons (always visible)
+    sites.forEach(site => {
+        // [MODIFIED] Call createTabButton with 'false' for core sites
+        const button = createTabButton(site, false);
+        coreButtonsContainer.appendChild(button);
+    });
+
+    // Populate user-added shortcuts into the expandable drawer
+    const shortcuts = getShortcuts();
+    shortcuts.forEach(shortcut => {
+        // [MODIFIED] Call createTabButton with 'true' for user shortcuts
+        const button = createTabButton(shortcut, true);
+        shortcutButtonsContainer.appendChild(button);
+    });
+}
+
+    // === Data Handling & Modal Logic ===
+
+    function getShortcuts() {
+        const shortcutsJSON = localStorage.getItem(STORAGE_KEY);
+        return shortcutsJSON ? JSON.parse(shortcutsJSON) : [];
+    }
+
+    function saveShortcuts(shortcutsArray) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcutsArray));
+        populateBottomBar();
+        renderManagementList();
+    }
+
+    function renderManagementList() {
+        shortcutsList.innerHTML = '';
+        const shortcuts = getShortcuts();
+        if (shortcuts.length === 0) {
+            shortcutsList.innerHTML = '<li>No shortcuts added yet.</li>';
+            return;
+        }
+        shortcuts.forEach(shortcut => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <span class="shortcut-info">${shortcut.name}</span>
+                <div class="shortcut-actions">
+                    <button class="edit-btn" data-id="${shortcut.id}">Edit</button>
+                    <button class="delete-btn" data-id="${shortcut.id}">Delete</button>
+                </div>
+            `;
+            shortcutsList.appendChild(listItem);
+        });
+    }
+
+    function handleSaveShortcut() {
+        const id = shortcutIdInput.value;
+        const name = shortcutNameInput.value.trim();
+        let url = shortcutUrlInput.value.trim();
+        if (!name || !url) {
+            alert('Shortcut Name and URL cannot be empty.');
+            return;
+        }
+        if (!/^(https?:\/\/|ftp:\/\/)/i.test(url)) {
+            url = 'https://' + url;
+        }
+        try {
+            new URL(url);
+        } catch (error) {
+            alert('The URL seems to be invalid, even after attempting to add "https://". Please check the format.');
+            return;
+        }
+        let shortcuts = getShortcuts();
+        if (id) {
+            const shortcutToUpdate = shortcuts.find(s => String(s.id) === String(id));
+            if (shortcutToUpdate) {
+                shortcutToUpdate.name = name;
+                shortcutToUpdate.url = url;
+            }
+        } else {
+            shortcuts.push({ id: crypto.randomUUID(), name: name, url: url });
+        }
+        saveShortcuts(shortcuts);
+        closeModal();
+    }
+
     function resetForm() {
         formTitle.textContent = 'Add New Shortcut';
         shortcutIdInput.value = '';
@@ -61,140 +205,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         shortcutModal.classList.remove('show');
     }
-
-    // === Data Handling Functions (localStorage) ===
-    const STORAGE_KEY = 'yy_admin_shortcuts';
-
-    function getShortcuts() {
-        const shortcutsJSON = localStorage.getItem(STORAGE_KEY);
-        return shortcutsJSON ? JSON.parse(shortcutsJSON) : [];
-    }
-
-    function saveShortcuts(shortcutsArray) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcutsArray));
-        renderShortcutTabs();
-        renderManagementList();
-    }
-
-    // === UI Rendering Functions ===
-    function renderShortcutTabs() {
-        document.querySelectorAll('.shortcut-tab').forEach(tab => tab.remove());
-        
-        const shortcuts = getShortcuts();
-        shortcuts.forEach(shortcut => {
-            const tabDiv = document.createElement('div');
-            tabDiv.className = 'tab-item shortcut-tab'; 
-            tabDiv.textContent = shortcut.name;
-            
-            tabDiv.addEventListener('click', () => {
-                activateTab(tabDiv, { name: shortcut.name, url: shortcut.url });
-            });
-            // [KEY CHANGE] Append to the new scrollable wrapper
-            scrollableTabsWrapper.appendChild(tabDiv);
-        });
-    }
-
-    function renderManagementList() {
-        shortcutsList.innerHTML = '';
-        const shortcuts = getShortcuts();
-
-        if (shortcuts.length === 0) {
-            shortcutsList.innerHTML = '<li>No shortcuts added yet.</li>';
-            return;
-        }
-
-        shortcuts.forEach(shortcut => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                <span class="shortcut-info">${shortcut.name}</span>
-                <div class="shortcut-actions">
-                    <button class="edit-btn" data-id="${shortcut.id}">Edit</button>
-                    <button class="delete-btn" data-id="${shortcut.id}">Delete</button>
-                </div>
-            `;
-            shortcutsList.appendChild(listItem);
-        });
-    }
-
-    // === CRUD Logic ===
-    function handleSaveShortcut() {
-    // === Step 1: Get data from form inputs ===
-    const id = shortcutIdInput.value;
-    const name = shortcutNameInput.value.trim();
-    let url = shortcutUrlInput.value.trim(); // Use 'let' because we might modify it
-
-    // === Step 2: Basic validation for empty fields ===
-    if (!name || !url) {
-        alert('Shortcut Name and URL cannot be empty.');
-        return;
-    }
-
-    // === Step 3: [NEW FEATURE] Smartly add 'https://' if no protocol is present ===
-    // This regex checks if the string starts with a common protocol like http://, https://, ftp://
-    if (!/^(https?:\/\/|ftp:\/\/)/i.test(url)) {
-        console.log(`Protocol missing. Prepending 'https://' to '${url}'`);
-        url = 'https://' + url;
-    }
-
-    // === Step 4: Now, validate the final URL format ===
-    try {
-        new URL(url);
-    } catch (error) {
-        alert('The URL seems to be invalid, even after attempting to add "https://". Please check the format.');
-        return;
-    }
-
-    // === Step 5: Get the current list of shortcuts ===
-    let shortcuts = getShortcuts();
-
-    // === Step 6: Differentiate between UPDATE (has ID) and CREATE (no ID) ===
-    if (id) {
-        // This is an UPDATE operation
-        // Use String() conversion and strict equality '===' for safer comparison
-        const shortcutToUpdate = shortcuts.find(s => String(s.id) === String(id));
-        if (shortcutToUpdate) {
-            shortcutToUpdate.name = name;
-            shortcutToUpdate.url = url;
-        }
-    } else {
-        // This is a CREATE operation
-        const newShortcut = {
-            // Use the more robust crypto.randomUUID() for new IDs.
-            // This avoids potential collisions from Date.now().
-            id: crypto.randomUUID(),
-            name: name,
-            url: url
-        };
-        shortcuts.push(newShortcut);
-    }
-
-    // === Step 7: Save the updated array back to localStorage and re-render UI ===
-    saveShortcuts(shortcuts);
-
-    // === Step 8: Special logic to auto-activate the very first shortcut added ===
-    // This part is for when the 'sites' array is empty and this is the first shortcut.
-    if (!id && (sites.length + shortcuts.length) === 1) {
-        setTimeout(() => {
-            const newTabElement = document.querySelector('.shortcut-tab');
-            if (newTabElement) {
-                activateTab(newTabElement, shortcuts[0]);
-            }
-        }, 0);
-    }
-
-    // === Step 9: Close the modal after completion ===
-    closeModal();
-}
     
     // === Event Listeners ===
+
+    toggleDrawerBtn.addEventListener('click', toggleDrawer);
     manageShortcutsBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
+
     shortcutModal.addEventListener('click', (event) => {
         if (event.target === shortcutModal) {
             closeModal();
         }
     });
+
     saveShortcutBtn.addEventListener('click', handleSaveShortcut);
+
     shortcutsList.addEventListener('click', (event) => {
         const target = event.target;
         const id = target.dataset.id;
@@ -202,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (target.classList.contains('edit-btn')) {
             let shortcuts = getShortcuts();
-            const shortcutToEdit = shortcuts.find(s => s.id == id);
+            const shortcutToEdit = shortcuts.find(s => String(s.id) === String(id));
             if (shortcutToEdit) {
                 formTitle.textContent = 'Edit Shortcut';
                 shortcutIdInput.value = shortcutToEdit.id;
@@ -210,63 +235,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 shortcutUrlInput.value = shortcutToEdit.url;
             }
         }
-
         if (target.classList.contains('delete-btn')) {
             if (confirm('Are you sure you want to delete this shortcut?')) {
                 let shortcuts = getShortcuts();
-                const updatedShortcuts = shortcuts.filter(s => s.id != id);
+                const updatedShortcuts = shortcuts.filter(s => String(s.id) !== String(id));
                 saveShortcuts(updatedShortcuts);
             }
         }
     });
 
     // === Initial Application Setup ===
+
     function initializeApp() {
-        const allPossibleTabs = [...sites, ...getShortcuts()];
+        populateBottomBar();
         
-        if (allPossibleTabs.length === 0) {
-            // This logic is for the full bookmark version. It does nothing if `sites` array has items.
-            // For V2.0, since `sites` has items, this part is inactive.
-        }
-
+        const allPossibleSites = [...sites, ...getShortcuts()];
         const lastUrl = localStorage.getItem('lastActiveUrl');
-        let siteToLoad = allPossibleTabs.find(tab => tab.url === lastUrl);
-        if (!siteToLoad && allPossibleTabs.length > 0) {
-            siteToLoad = allPossibleTabs[0];
-        }
-        
-        if (!siteToLoad) {
-             topBar.textContent = 'No sites configured.';
-             return;
-        }
+        let siteToLoad = allPossibleSites.find(site => site.url === lastUrl) || allPossibleSites[0];
 
-        // Render core tabs
-        sites.forEach(site => {
-            const tabDiv = document.createElement('div');
-            tabDiv.className = 'tab-item';
-            tabDiv.textContent = site.name;
-            tabDiv.addEventListener('click', () => activateTab(tabDiv, site));
-            // [KEY CHANGE] Append to the new scrollable wrapper
-            scrollableTabsWrapper.appendChild(tabDiv);
-        });
-        
-        renderShortcutTabs();
-        
         if (siteToLoad) {
             setTimeout(() => {
-                const allTabElements = document.querySelectorAll('.tab-item');
-                let tabElementToActivate = Array.from(allTabElements).find(el => {
-                    const tabName = el.textContent;
-                    const correspondingTabObject = allPossibleTabs.find(t => t.name === tabName);
-                    return correspondingTabObject && correspondingTabObject.url === siteToLoad.url;
-                });
-    
-                if (tabElementToActivate) {
-                    activateTab(tabElementToActivate, siteToLoad);
+                const allButtons = document.querySelectorAll('.bottom-bar .tab-item');
+                const buttonToActivate = Array.from(allButtons).find(btn => btn.title === siteToLoad.name);
+                
+                if (buttonToActivate) {
+                    activateButton(buttonToActivate, siteToLoad);
+                } else if (allButtons.length > 0) {
+                    // Fallback if last active site was deleted
+                    activateButton(allButtons[0], allPossibleSites[0]);
                 }
             }, 0);
         }
     }
 
+    // Run the app
     initializeApp();
 });

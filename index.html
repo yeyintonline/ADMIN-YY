@@ -8,23 +8,35 @@
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    
+
     <div class="app-container">
       
-        <div class="top-bar">
-            <div id="manage-shortcuts-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px"><path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z"/><path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z"/></svg>
-            </div>
-
-            <div id="scrollable-tabs-wrapper" class="scrollable-tabs">
-                </div>
-        </div>
-        
-        <div class="content">
+        <main class="content">
             <div id="loader" class="top-loader"></div>
-            <iframe id="web-view" src="" frameborder="0"></iframe>
-        </div>
-        
+            
+            <iframe id="web-view" src="about:blank" frameborder="0" title="Web Content Display"></iframe>
+        </main>
+
+        <nav class="bottom-bar" id="bottom-bar">
+            <div class="visible-bar">
+              
+              <button id="toggle-drawer-btn" aria-label="Show More Shortcuts">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px"><path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" /></svg>
+             </button>
+
+           <div id="core-buttons-container" class="core-buttons">
+           </div>
+    
+             <button id="manage-shortcuts-btn" aria-label="Manage Shortcuts">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px"><path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z"/><path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z"/></svg>
+    </button>
+</div>
+
+            <div class="expandable-drawer">
+                <div id="shortcut-buttons-container" class="shortcut-grid">
+                    </div>
+            </div>
+        </nav>
     </div>
 
     <div id="shortcut-modal" class="modal-overlay">
@@ -54,10 +66,11 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(r => console.log('Service Worker registered successfully.'));
+                navigator.serviceWorker.register('/sw.js').then(r => console.log('Service Worker registered.'));
             });
         }
     </script>
-    <script src="app.js?v=2.1.2"></script>
+    <script src="app.js?v=3.0.0"></script>
+
 </body>
 </html>
