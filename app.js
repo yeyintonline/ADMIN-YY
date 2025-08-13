@@ -1,5 +1,5 @@
 // ==============================================
-// === app.js - V3.0 Final Production Version ===
+// === app.js - V3.1.2 Final Production Version ===
 // ==============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,13 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortcutUrlInput = document.getElementById('shortcut-url');
     const saveShortcutBtn = document.getElementById('save-shortcut-btn');
 
-
-
-//
-// ---> app.js ထဲတွင် ဤ function ကို အစားထိုးရန် <---
-//
-
-function toggleDrawer() {
+    // === UI Rendering Functions ===
+  function toggleDrawer() {
     isDrawerOpen = !isDrawerOpen;
     bottomBar.classList.toggle('is-open', isDrawerOpen);
 
@@ -51,10 +46,7 @@ function toggleDrawer() {
     // If a shortcut IS active, we DO NOTHING here. We let the activateButton function
     // control the active state, ensuring it stays ON even when the drawer closes.
 }
-
-    // === UI Rendering Functions ===
-
-/**
+  /**
  * Creates a button element for the bottom bar.
  * Assigns a shared base class (.tab-item) and a specific modifier class 
  * (.core-button or .shortcut-button).
@@ -62,7 +54,7 @@ function toggleDrawer() {
  * @param {boolean} isShortcut - If true, applies the shortcut-specific class.
  * @returns {HTMLButtonElement}
  */
-function createTabButton(site, isShortcut = false) {
+  function createTabButton(site, isShortcut = false) {
     const button = document.createElement('button');
     button.className = 'tab-item';
     if (isShortcut) {
@@ -81,8 +73,7 @@ function createTabButton(site, isShortcut = false) {
     });
     return button;
 }
-
-function activateButton(buttonElement, site, isShortcut) {
+  function activateButton(buttonElement, site, isShortcut) {
     if (webView.src === site.url) {
         return;
     }
@@ -115,12 +106,11 @@ function activateButton(buttonElement, site, isShortcut) {
     currentActiveButton = buttonElement;
     localStorage.setItem('lastActiveUrl', site.url);
 }
-
-/**
+  /**
  * Clears and re-renders all buttons in the bottom bar, separating core sites
  * from user-added shortcuts.
  */
-function populateBottomBar() {
+  function populateBottomBar() {
     coreButtonsContainer.innerHTML = '';
     shortcutButtonsContainer.innerHTML = '';
 
@@ -141,18 +131,15 @@ function populateBottomBar() {
 }
 
     // === Data Handling & Modal Logic ===
-
     function getShortcuts() {
         const shortcutsJSON = localStorage.getItem(STORAGE_KEY);
         return shortcutsJSON ? JSON.parse(shortcutsJSON) : [];
     }
-
     function saveShortcuts(shortcutsArray) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcutsArray));
         populateBottomBar();
         renderManagementList();
     }
-
     function renderManagementList() {
         shortcutsList.innerHTML = '';
         const shortcuts = getShortcuts();
@@ -172,7 +159,6 @@ function populateBottomBar() {
             shortcutsList.appendChild(listItem);
         });
     }
-
     function handleSaveShortcut() {
         const id = shortcutIdInput.value;
         const name = shortcutNameInput.value.trim();
@@ -203,41 +189,33 @@ function populateBottomBar() {
         saveShortcuts(shortcuts);
         closeModal();
     }
-
     function resetForm() {
         formTitle.textContent = 'Add New Shortcut';
         shortcutIdInput.value = '';
         shortcutNameInput.value = '';
         shortcutUrlInput.value = '';
     }
-
     function openModal() {
         resetForm();
         renderManagementList();
         shortcutModal.classList.add('show');
         manageShortcutsBtn.classList.add('active');
     }
-
     function closeModal() {
         shortcutModal.classList.remove('show');
         manageShortcutsBtn.classList.remove('active');
     }
-    
-    
-    // === Event Listeners ===
 
+    // === Event Listeners ===
     toggleDrawerBtn.addEventListener('click', toggleDrawer);
     manageShortcutsBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
-
     shortcutModal.addEventListener('click', (event) => {
         if (event.target === shortcutModal) {
             closeModal();
         }
     });
-
     saveShortcutBtn.addEventListener('click', handleSaveShortcut);
-
     shortcutsList.addEventListener('click', (event) => {
         const target = event.target;
         const id = target.dataset.id;
@@ -262,25 +240,32 @@ function populateBottomBar() {
         }
     });
 
-function initializeApp() {
+
+    function initializeApp() {
     populateBottomBar();
     
     const allPossibleSites = [...sites, ...getShortcuts()];
     if (allPossibleSites.length === 0) return;
 
-    // The logic is now simpler: it only uses localStorage, not the URL hash.
     const lastUrl = localStorage.getItem('lastActiveUrl');
     let siteToLoad = allPossibleSites.find(site => site.url === lastUrl) || allPossibleSites[0];
 
     if (siteToLoad) {
+        // [NEW] Determine if the site to be loaded is a shortcut or a core site.
+        // It's a shortcut if it's NOT found in the hardcoded 'sites' array.
+        const isInitialLoadShortcut = !sites.some(s => s.url === siteToLoad.url);
+
         setTimeout(() => {
             const allButtons = document.querySelectorAll('.bottom-bar .tab-item');
             const buttonToActivate = Array.from(allButtons).find(btn => btn.title === siteToLoad.name);
             
             if (buttonToActivate) {
-                activateButton(buttonToActivate, siteToLoad);
+                // [FIX] Pass the correct 'isInitialLoadShortcut' boolean as the third argument.
+                activateButton(buttonToActivate, siteToLoad, isInitialLoadShortcut);
             } else if (allButtons.length > 0) {
-                activateButton(allButtons[0], allPossibleSites[0]);
+                // Also pass the flag for the fallback scenario
+                const isFallbackShortcut = !sites.some(s => s.url === allPossibleSites[0].url);
+                activateButton(allButtons[0], allPossibleSites[0], isFallbackShortcut);
             }
         }, 0);
     }

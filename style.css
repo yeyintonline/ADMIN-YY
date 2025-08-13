@@ -1,5 +1,5 @@
 /* ======================================================= */
-/* === style.css - V4.0.2 Final Flexbox Architecture   === */
+/* === style.css - V3.1.2 Final Flexbox Architecture   === */
 /* ======================================================= */
 
 /* === 1. Theme & Layout Control Panel === */
@@ -88,7 +88,6 @@ html, body {
 }
 .visible-bar {
   display: flex; align-items: center; height: var(--bar-height); padding: 0 10px; gap: 8px; }
-
 .expandable-drawer {
   /* Use the SAME new variable in the calculation */
   height: calc(var(--drawer-expanded-height) - var(--bar-height));
@@ -96,8 +95,7 @@ html, body {
   padding: 10px;
   overflow-x: hidden; /* Keep this for stability */
 }
-
-/* === Shortcut Button Count === */
+/* 🟥🟥🟥 Shortcut Button Edit */
 .shortcut-grid {
   display: grid; 
   grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
@@ -117,7 +115,6 @@ html, body {
 .core-buttons::-webkit-scrollbar {
   display: none;
 }
-
 .tab-item {
   display: flex;
   align-items: center;
@@ -150,11 +147,8 @@ html, body {
   height: var(--button-height-shortcut);
   color: var(--text-color-blue);
 }
-
 .tab-item:hover, #toggle-drawer-btn:hover, #manage-shortcuts-btn:hover {
   background: var(--button-background-hover); box-shadow: var(--button-shadow-hover); }
-  
-
 .tab-item.active,
 #toggle-drawer-btn.active,
 #manage-shortcuts-btn.active {
@@ -164,7 +158,6 @@ html, body {
   box-shadow: var(--button-shadow-active);
   font-weight: 700;
 }
-  
 #toggle-drawer-btn, #manage-shortcuts-btn {
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: var(--button-height-action); height: var(--button-height-action); min-width: var(--button-height-action); padding: 0; margin: 0; border-radius: 7px; background: var(--button-background-default); border: 1px solid var(--panel-border-color); color: var(--text-color-blue); cursor: pointer; -webkit-tap-highlight-color: transparent; box-shadow: var(--button-shadow-default); transition: all 0.2s ease-in-out; }
 #toggle-drawer-btn svg path {
@@ -213,4 +206,3 @@ html, body {
   color: var(--danger-color); }
 #shortcuts-list .shortcut-actions .edit-btn {
   color: var(--info-color); }
-  
